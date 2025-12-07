@@ -28,7 +28,11 @@ const routes = [
     // Default redirect
     {
         path: '/',
-        redirect: '/dashboard'
+        name: 'landing',
+        component: () => import('@/pages/Landing.vue'),
+        meta: {
+            requiresGuest: true
+        }
     }
 ];
 
