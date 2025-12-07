@@ -1,0 +1,190 @@
+{
+    "info": {
+        "name": "Product Inventory System - Authentication API",
+        "_postman_id": "auth-api-collection",
+        "description": "Laravel Sanctum Authentication API endpoints",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000/api",
+            "type": "string"
+        },
+        {
+            "key": "auth_token",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Register",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"SecurePass123!@#\",\n  \"password_confirmation\": \"SecurePass123!@#\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/register",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "register"]
+                        },
+                        "description": "Register a new user account"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set(\"auth_token\", jsonData.data.token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"SecurePass123!@#\",\n  \"remember\": false\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "login"]
+                        },
+                        "description": "Login and receive authentication token"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/auth/profile",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "profile"]
+                        },
+                        "description": "Get authenticated user profile"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/auth/logout",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "logout"]
+                        },
+                        "description": "Logout and revoke current token"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Logout All Devices",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/auth/logout-all",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "logout-all"]
+                        },
+                        "description": "Logout from all devices and revoke all tokens"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Authentication endpoints"
+        }
+    ]
+}
