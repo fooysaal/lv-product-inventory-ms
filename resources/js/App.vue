@@ -1,18 +1,7 @@
-<!-- resources/js/App.vue -->
 <template>
-    <div>
-        <h1>Hello from Vue!</h1>
-        <!-- Your other Vue components will go here -->
-    </div>
+    <router-view />
 </template>
 
-<script>
-export default {
-    name: 'App',
-    // Component logic
-};
+<script setup>
+// Main App component with Vue Router
 </script>
-
-<style scoped>
-/* Scoped styles for this component */
-</style>
