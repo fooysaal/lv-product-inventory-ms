@@ -1,12 +1,36 @@
 <template>
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <!-- Navigation would go here -->
-        <main>
-            <router-view />
-        </main>
+    <div class="min-h-screen bg-gray-50">
+        <!-- Sidebar -->
+        <Sidebar
+            :is-open="isSidebarOpen"
+            @close="isSidebarOpen = false"
+        />
+
+        <!-- Main Content Area -->
+        <div class="md:pl-64 flex flex-col flex-1">
+            <!-- Header -->
+            <Header
+                :sidebar-open="isSidebarOpen"
+                @toggle-sidebar="isSidebarOpen = !isSidebarOpen"
+            />
+
+            <!-- Page Content -->
+            <main class="flex-1 pt-16">
+                <div class="py-6">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                        <router-view />
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 </template>
 
 <script setup>
-// Default layout for authenticated pages
+import { ref } from 'vue';
+import Sidebar from '@/components/Layout/Sidebar.vue';
+import Header from '@/components/Layout/Header.vue';
+
+// Sidebar state
+const isSidebarOpen = ref(false);
 </script>
