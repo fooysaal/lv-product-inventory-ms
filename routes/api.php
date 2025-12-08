@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\UserTypeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +33,10 @@ Route::middleware('auth:sanctum')->prefix('auth')->group(function () {
 // Dashboard Routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('api.dashboard');
+
+    // User Type Management
+    Route::apiResource('user-types', UserTypeController::class);
+    Route::patch('/user-types/{userType}/toggle-status', [UserTypeController::class, 'toggleStatus'])->name('user-types.toggle-status');
 });
 
 // Legacy route - kept for backward compatibility
