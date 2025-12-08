@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\UserTypeController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -37,6 +38,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // User Type Management
     Route::apiResource('user-types', UserTypeController::class);
     Route::patch('/user-types/{userType}/toggle-status', [UserTypeController::class, 'toggleStatus'])->name('user-types.toggle-status');
+
+    // User Management
+    Route::get('/users/user-types', [UserController::class, 'getUserTypes'])->name('users.user-types');
+    Route::apiResource('users', UserController::class);
+    Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+    Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
 });
 
 // Legacy route - kept for backward compatibility

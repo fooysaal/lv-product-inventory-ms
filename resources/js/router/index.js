@@ -58,6 +58,38 @@ const routes = [
         }
     },
 
+    // User Routes
+    {
+        path: '/users',
+        name: 'users.index',
+        component: () => import('@/pages/Users/Index.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Users'
+        }
+    },
+    {
+        path: '/users/create',
+        name: 'users.create',
+        component: () => import('@/pages/Users/Form.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Create User'
+        }
+    },
+    {
+        path: '/users/:id/edit',
+        name: 'users.edit',
+        component: () => import('@/pages/Users/Form.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Edit User'
+        }
+    },
+
     // Default redirect
     {
         path: '/',
