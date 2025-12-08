@@ -31,6 +31,7 @@ const routes = [
         name: 'landing',
         component: () => import('@/pages/Landing.vue'),
         meta: {
+            layout: AuthLayout,
             requiresGuest: true
         }
     }
