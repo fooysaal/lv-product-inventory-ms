@@ -195,6 +195,24 @@ const routes = [
             layout: AuthLayout,
             requiresGuest: true
         }
+    },
+
+    // Error Pages
+    {
+        path: '/500',
+        name: 'server-error',
+        component: () => import('@/pages/Errors/ServerError.vue'),
+        meta: {
+            layout: AuthLayout
+        }
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'not-found',
+        component: () => import('@/pages/Errors/NotFound.vue'),
+        meta: {
+            layout: AuthLayout
+        }
     }
 ];
 
