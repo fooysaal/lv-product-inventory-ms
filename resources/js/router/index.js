@@ -90,6 +90,102 @@ const routes = [
         }
     },
 
+    // Category Routes
+    {
+        path: '/categories',
+        name: 'categories.index',
+        component: () => import('@/pages/Categories/Index.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Categories'
+        }
+    },
+    {
+        path: '/categories/create',
+        name: 'categories.create',
+        component: () => import('@/pages/Categories/Form.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Create Category'
+        }
+    },
+    {
+        path: '/categories/:id/edit',
+        name: 'categories.edit',
+        component: () => import('@/pages/Categories/Form.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Edit Category'
+        }
+    },
+
+    // Unit Routes
+    {
+        path: '/units',
+        name: 'units.index',
+        component: () => import('@/pages/Units/Index.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Units'
+        }
+    },
+    {
+        path: '/units/create',
+        name: 'units.create',
+        component: () => import('@/pages/Units/Form.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Create Unit'
+        }
+    },
+    {
+        path: '/units/:id/edit',
+        name: 'units.edit',
+        component: () => import('@/pages/Units/Form.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Edit Unit'
+        }
+    },
+
+    // Product Routes
+    {
+        path: '/products',
+        name: 'products.index',
+        component: () => import('@/pages/Products/Index.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Products'
+        }
+    },
+    {
+        path: '/products/create',
+        name: 'products.create',
+        component: () => import('@/pages/Products/Form.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Create Product'
+        }
+    },
+    {
+        path: '/products/:id/edit',
+        name: 'products.edit',
+        component: () => import('@/pages/Products/Form.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Edit Product'
+        }
+    },
+
     // Default redirect
     {
         path: '/',
