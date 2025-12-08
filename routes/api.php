@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\UnitController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\WarehouseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -68,6 +69,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/products/form-data', [ProductController::class, 'getFormData'])->name('products.form-data');
     Route::apiResource('products', ProductController::class);
     Route::patch('/products/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->name('products.toggle-status');
+
+    // Warehouse Management
+    Route::get('/warehouses/managers', [WarehouseController::class, 'getManagers'])->name('warehouses.managers');
+    Route::get('/warehouses/{warehouse}/statistics', [WarehouseController::class, 'statistics'])->name('warehouses.statistics');
+    Route::apiResource('warehouses', WarehouseController::class);
+    Route::patch('/warehouses/{warehouse}/toggle-status', [WarehouseController::class, 'toggleStatus'])->name('warehouses.toggle-status');
 });
 
 // Legacy route - kept for backward compatibility

@@ -186,6 +186,38 @@ const routes = [
         }
     },
 
+    // Warehouse Routes
+    {
+        path: '/warehouses',
+        name: 'warehouses.index',
+        component: () => import('@/pages/Warehouses/Index.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Warehouses'
+        }
+    },
+    {
+        path: '/warehouses/create',
+        name: 'warehouses.create',
+        component: () => import('@/pages/Warehouses/Form.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Create Warehouse'
+        }
+    },
+    {
+        path: '/warehouses/:id/edit',
+        name: 'warehouses.edit',
+        component: () => import('@/pages/Warehouses/Form.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Edit Warehouse'
+        }
+    },
+
     // Default redirect
     {
         path: '/',
