@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +27,11 @@ Route::middleware('auth:sanctum')->prefix('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.auth.logout');
     Route::post('/logout-all', [AuthController::class, 'logoutAll'])->name('api.auth.logout-all');
     Route::get('/profile', [AuthController::class, 'profile'])->name('api.auth.profile');
+});
+
+// Dashboard Routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('api.dashboard');
 });
 
 // Legacy route - kept for backward compatibility

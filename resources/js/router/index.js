@@ -21,7 +21,8 @@ const routes = [
         component: () => import('@/pages/Dashboard/Index.vue'),
         meta: {
             layout: DefaultLayout,
-            requiresAuth: true
+            requiresAuth: true,
+            title: 'Dashboard'
         }
     },
 

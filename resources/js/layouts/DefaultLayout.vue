@@ -1,8 +1,15 @@
 <template>
     <div class="min-h-screen bg-gray-50">
+        <!-- Mobile Sidebar Backdrop -->
+        <div
+            v-if="isSidebarOpen"
+            @click="isSidebarOpen = false"
+            class="fixed inset-0 z-30 bg-gray-900 bg-opacity-50 md:hidden"
+        ></div>
+
         <!-- Sidebar -->
         <Sidebar
-            :is-open="isSidebarOpen"
+            :sidebar-open="isSidebarOpen"
             @close="isSidebarOpen = false"
         />
 
