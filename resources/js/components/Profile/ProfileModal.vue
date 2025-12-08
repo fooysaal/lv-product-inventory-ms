@@ -26,7 +26,7 @@
                 >
                     <!-- Modal Header -->
                     <div class="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
-                        <h2 class="text-2xl font-bold text-gray-800">My Profile</h2>
+                        <h2 class="text-2xl font-bold text-gray-800">Update Profile Info</h2>
                         <button
                             @click="handleClose"
                             class="w-8 h-8 flex items-center justify-center text-gray-400 hover:bg-gray-100 rounded-lg transition-colors"
@@ -96,7 +96,7 @@
                                             v-model="profileForm.name"
                                             type="text"
                                             placeholder="Enter your full name"
-                                            class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
                                             :class="{'border-red-500': profileErrors.name, 'border-gray-300': !profileErrors.name}"
                                             required
                                         />
@@ -114,7 +114,7 @@
                                             v-model="profileForm.email"
                                             type="email"
                                             placeholder="Enter your email"
-                                            class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
                                             :class="{'border-red-500': profileErrors.email, 'border-gray-300': !profileErrors.email}"
                                             required
                                         />
@@ -132,7 +132,7 @@
                                             v-model="profileForm.phone"
                                             type="text"
                                             placeholder="Enter your phone number"
-                                            class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
                                             :class="{'border-red-500': profileErrors.phone, 'border-gray-300': !profileErrors.phone}"
                                         />
                                         <p v-if="profileErrors.phone" class="mt-1.5 text-xs text-red-600">
@@ -191,7 +191,7 @@
                                                 v-model="passwordForm.current_password"
                                                 :type="showCurrentPassword ? 'text' : 'password'"
                                                 placeholder="Enter current password"
-                                                class="w-full px-4 py-2.5 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                class="w-full px-4 py-2.5 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
                                                 :class="{'border-red-500': passwordErrors.current_password, 'border-gray-300': !passwordErrors.current_password}"
                                                 required
                                             />
@@ -218,7 +218,7 @@
                                                 v-model="passwordForm.new_password"
                                                 :type="showNewPassword ? 'text' : 'password'"
                                                 placeholder="Enter new password"
-                                                class="w-full px-4 py-2.5 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                class="w-full px-4 py-2.5 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
                                                 :class="{'border-red-500': passwordErrors.new_password, 'border-gray-300': !passwordErrors.new_password}"
                                                 required
                                             />
@@ -245,7 +245,7 @@
                                                 v-model="passwordForm.new_password_confirmation"
                                                 :type="showConfirmPassword ? 'text' : 'password'"
                                                 placeholder="Confirm new password"
-                                                class="w-full px-4 py-2.5 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                class="w-full px-4 py-2.5 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
                                                 :class="{'border-red-500': passwordErrors.new_password_confirmation, 'border-gray-300': !passwordErrors.new_password_confirmation}"
                                                 required
                                             />
