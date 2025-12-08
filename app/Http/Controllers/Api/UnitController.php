@@ -59,7 +59,7 @@ class UnitController extends Controller
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255|unique:units,name',
-                'short_name' => 'required|string|max:50|unique:units,short_name',
+                'short_name' => 'required|string|max:10|unique:units,short_name',
                 'description' => 'nullable|string',
                 'is_active' => 'boolean',
             ]);
