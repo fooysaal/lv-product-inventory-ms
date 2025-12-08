@@ -1,6 +1,11 @@
 import { ref, reactive } from 'vue';
 import { apiService } from '@/services/api';
 
+// Shared state across all instances
+const storedUser = localStorage.getItem('user');
+const user = ref(storedUser ? JSON.parse(storedUser) : null);
+const token = ref(localStorage.getItem('auth_token') || null);
+
 export function useAuth() {
     const form = reactive({
         email: '',
@@ -16,8 +21,6 @@ export function useAuth() {
 
     const showPassword = ref(false);
     const loading = ref(false);
-    const user = ref(null);
-    const token = ref(localStorage.getItem('auth_token') || null);
 
     /**
      * Validate form inputs
@@ -152,6 +155,15 @@ export function useAuth() {
     };
 
     /**
+     * Initialize auth - fetch user profile if token exists but user data is incomplete
+     */
+    const initAuth = async () => {
+        if (token.value && (!user.value || !user.value.user_type)) {
+            await getProfile();
+        }
+    };
+
+    /**
      * Check if user is authenticated
      */
     const isAuthenticated = () => {
@@ -205,6 +217,7 @@ export function useAuth() {
         register,
         logout,
         getProfile,
+        initAuth,
         isAuthenticated,
         resetForm
     };

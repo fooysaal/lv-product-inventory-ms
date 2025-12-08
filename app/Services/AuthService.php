@@ -22,6 +22,9 @@ class AuthService
             'password' => Hash::make($data['password']),
         ]);
 
+        // Load the user type relationship
+        $user->load('userType');
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return [
@@ -39,7 +42,7 @@ class AuthService
      */
     public function login(array $credentials): array
     {
-        $user = User::where('email', $credentials['email'])->first();
+        $user = User::with('userType')->where('email', $credentials['email'])->first();
 
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             throw ValidationException::withMessages([
@@ -92,6 +95,6 @@ class AuthService
      */
     public function getProfile(User $user): User
     {
-        return $user->load('tokens');
+        return $user->load(['userType', 'tokens']);
     }
 }

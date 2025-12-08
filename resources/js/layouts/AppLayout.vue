@@ -15,6 +15,8 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue';
 const route = useRoute();
 
 const layout = computed(() => {
-    return route.meta.layout || DefaultLayout;
+    // If layout is explicitly set in route meta, use it
+    // Otherwise, default to AuthLayout for safety (guest pages)
+    return route.meta.layout || AuthLayout;
 });
 </script>

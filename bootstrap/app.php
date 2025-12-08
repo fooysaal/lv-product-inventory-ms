@@ -1,13 +1,15 @@
 <?php
 
-use App\Http\Middleware\ForceJsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
+use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\ForceJsonResponse;
+use Illuminate\Auth\AuthenticationException;
+use App\Http\Middleware\StockManagerMiddleware;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Illuminate\Auth\AuthenticationException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,6 +21,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->api(prepend: [
             ForceJsonResponse::class,
+        ]);
+        $middleware->alias([
+            'admin' => AdminMiddleware::class,
+            'stock-manager' => StockManagerMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
