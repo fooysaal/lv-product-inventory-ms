@@ -93,16 +93,15 @@
                                 </div>
 
                                 <!-- Menu Items -->
-                                <router-link
-                                    to="/profile"
-                                    class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                    @click="closeUserMenu"
+                                <button
+                                    @click="openProfileModal"
+                                    class="w-full flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                                 >
                                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                     </svg>
-                                    My Profile
-                                </router-link>
+                                    Update Profile
+                                </button>
 
                                 <!-- <router-link
                                     to="/settings"
@@ -133,6 +132,14 @@
                 </div>
             </div>
         </div>
+
+        <!-- Profile Modal -->
+        <ProfileModal
+            :show="showProfileModal"
+            :user="user"
+            @close="closeProfileModal"
+            @updated="handleProfileUpdated"
+        />
     </header>
 </template>
 
@@ -140,6 +147,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuth } from '@/composables/useAuth';
+import ProfileModal from '@/components/Profile/ProfileModal.vue';
 
 const route = useRoute();
 const { user, logout, initAuth } = useAuth();
@@ -155,6 +163,7 @@ const emit = defineEmits(['toggle-sidebar']);
 
 const userMenuOpen = ref(false);
 const userMenuRef = ref(null);
+const showProfileModal = ref(false);
 
 const toggleSidebar = () => {
     emit('toggle-sidebar');
@@ -166,6 +175,20 @@ const toggleUserMenu = () => {
 
 const closeUserMenu = () => {
     userMenuOpen.value = false;
+};
+
+const openProfileModal = () => {
+    showProfileModal.value = true;
+    closeUserMenu();
+};
+
+const closeProfileModal = () => {
+    showProfileModal.value = false;
+};
+
+const handleProfileUpdated = async (updatedUser) => {
+    // Refresh the auth user data
+    await initAuth();
 };
 
 const handleLogout = async () => {
