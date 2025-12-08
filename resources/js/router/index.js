@@ -26,6 +26,38 @@ const routes = [
         }
     },
 
+    // User Type Routes
+    {
+        path: '/user-types',
+        name: 'user-types.index',
+        component: () => import('@/pages/UserTypes/Index.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'User Types'
+        }
+    },
+    {
+        path: '/user-types/create',
+        name: 'user-types.create',
+        component: () => import('@/pages/UserTypes/Form.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Create User Type'
+        }
+    },
+    {
+        path: '/user-types/:id/edit',
+        name: 'user-types.edit',
+        component: () => import('@/pages/UserTypes/Form.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Edit User Type'
+        }
+    },
+
     // Default redirect
     {
         path: '/',
