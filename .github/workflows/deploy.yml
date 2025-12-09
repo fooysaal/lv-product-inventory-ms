@@ -76,6 +76,8 @@ jobs:
             mkdir -p "${SHARED_PATH}/storage/logs"
 
             # Clone the repository into the new release directory
+            # Note: For private repositories, ensure SSH keys are properly configured on the server
+            # or use a personal access token: https://TOKEN@github.com/${{ github.repository }}.git
             git clone --depth 1 --branch ${{ github.ref_name }} https://github.com/${{ github.repository }}.git "${RELEASE_PATH}"
 
             # Create .env symlink if shared .env exists
@@ -88,7 +90,9 @@ jobs:
             fi
 
             # Link shared storage directory
-            rm -rf "${RELEASE_PATH}/storage"
+            if [ -d "${RELEASE_PATH}/storage" ]; then
+              rm -rf "${RELEASE_PATH}/storage"
+            fi
             ln -nfs "${SHARED_PATH}/storage" "${RELEASE_PATH}/storage"
 
             # Navigate to release directory
@@ -130,7 +134,13 @@ jobs:
 
             # Clean up old releases (keep last 5 releases)
             cd "${DEPLOY_ROOT}/releases"
-            ls -1t | tail -n +6 | xargs -r rm -rf
+            # Only delete directories that match the timestamp pattern (YYYYMMDD-HHMMSS)
+            ls -1t | grep -E '^[0-9]{8}-[0-9]{6}$' | tail -n +6 | while read -r old_release; do
+              if [ -d "${old_release}" ]; then
+                echo "Removing old release: ${old_release}"
+                rm -rf "${old_release}"
+              fi
+            done
 
             echo "Deployment completed successfully"
             echo "Release: ${RELEASE_NAME}"
