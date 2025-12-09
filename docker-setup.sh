@@ -4,21 +4,27 @@
 
 echo "🚀 Starting Laravel Warehouse Inventory Setup..."
 
+# Detect OS for sed compatibility
+SED_INPLACE=(-i)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    SED_INPLACE=(-i '')
+fi
+
 # Check if .env exists
 if [ ! -f .env ]; then
     echo "📝 Creating .env file from .env.example..."
     cp .env.example .env
 
     # Update database configuration for Docker
-    sed -i 's/DB_HOST=127.0.0.1/DB_HOST=db/' .env
-    sed -i 's/DB_DATABASE=lv_warehouse_inventory_ms/DB_DATABASE=lv_warehouse_inventory_ms/' .env
-    sed -i 's/DB_USERNAME=root/DB_USERNAME=warehouse_user/' .env
-    sed -i 's/DB_PASSWORD=/DB_PASSWORD=secret/' .env
+    sed "${SED_INPLACE[@]}" 's/DB_HOST=127.0.0.1/DB_HOST=db/' .env
+    sed "${SED_INPLACE[@]}" 's/DB_DATABASE=lv_warehouse_inventory_ms/DB_DATABASE=lv_warehouse_inventory_ms/' .env
+    sed "${SED_INPLACE[@]}" 's/DB_USERNAME=root/DB_USERNAME=warehouse_user/' .env
+    sed "${SED_INPLACE[@]}" 's/DB_PASSWORD=/DB_PASSWORD=secret/' .env
 
     # Update cache and session drivers
-    sed -i 's/CACHE_STORE=database/CACHE_STORE=redis/' .env
-    sed -i 's/SESSION_DRIVER=database/SESSION_DRIVER=redis/' .env
-    sed -i 's/QUEUE_CONNECTION=database/QUEUE_CONNECTION=redis/' .env
+    sed "${SED_INPLACE[@]}" 's/CACHE_STORE=database/CACHE_STORE=redis/' .env
+    sed "${SED_INPLACE[@]}" 's/SESSION_DRIVER=database/SESSION_DRIVER=redis/' .env
+    sed "${SED_INPLACE[@]}" 's/QUEUE_CONNECTION=database/QUEUE_CONNECTION=redis/' .env
 
     # Add Redis configuration if not present
     if ! grep -q "REDIS_HOST" .env; then
@@ -27,7 +33,7 @@ if [ ! -f .env ]; then
         echo "REDIS_PASSWORD=null" >> .env
         echo "REDIS_PORT=6379" >> .env
     else
-        sed -i 's/REDIS_HOST=127.0.0.1/REDIS_HOST=redis/' .env
+        sed "${SED_INPLACE[@]}" 's/REDIS_HOST=127.0.0.1/REDIS_HOST=redis/' .env
     fi
 
     echo "✅ .env file created and configured for Docker"
