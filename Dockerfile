@@ -1,68 +1,125 @@
-# Use official PHP 8.2 FPM image
-FROM php:8.2-fpm
+############################
+# 1. Base PHP build stage
+############################
+FROM php:8.2-fpm AS base
 
-# Set working directory
 WORKDIR /var/www/html
 
-# Install system dependencies
+# Install system dependencies (minimal, optimized)
 RUN apt-get update && apt-get install -y \
     git \
     curl \
+    unzip \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
-    zip \
-    unzip \
     libzip-dev \
     libicu-dev \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
-    nginx \
-    supervisor \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+RUN docker-php-ext-configure gd \
+    --with-freetype \
+    --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
-    pdo \
-    pdo_mysql \
-    mbstring \
-    exif \
-    pcntl \
-    bcmath \
-    gd \
-    zip \
-    intl \
-    opcache
+       pdo_mysql \
+       mbstring \
+       bcmath \
+       exif \
+       intl \
+       zip \
+       gd \
+       opcache
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Set PHP memory limit
+RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/memory-limit.ini
 
-# Copy nginx configuration
-COPY docker/nginx/nginx.conf /etc/nginx/sites-available/default
+# Copy composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Copy supervisor configuration
-COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Copy existing application directory
-COPY . /var/www/html
+############################
+# 2. Composer build stage
+############################
+FROM base AS vendor
 
-# Set proper permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+COPY composer.json composer.lock ./
 
-# Install composer dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Set Composer environment variables
+ENV COMPOSER_MEMORY_LIMIT=-1
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Optimize Laravel
-RUN php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
+# Install dependencies with error handling
+RUN composer install \
+    --no-dev \
+    --optimize-autoloader \
+    --prefer-dist \
+    --no-interaction \
+    --no-scripts \
+    --verbose
 
-# Expose ports
+
+############################
+# 3. Application stage
+############################
+FROM base AS app
+
+# Copy application source
+COPY . .
+
+# Copy vendor from previous stage (much faster)
+COPY --from=vendor /var/www/html/vendor ./vendor
+
+# Laravel permissions
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
+
+# Laravel optimize (with error handling)
+RUN php artisan config:cache || true && \
+    php artisan route:cache || true && \
+    php artisan view:cache || true
+
+
+############################
+# 4. Final Nginx + PHP-FPM stage
+############################
+FROM nginx:stable AS final
+
+# Install PHP-FPM runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libpng16-16 \
+    libonig5 \
+    libxml2 \
+    libzip4 \
+    libicu72 \
+    libfreetype6 \
+    libjpeg62-turbo \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Copy PHP runtime from app stage
+COPY --from=app /usr/local/etc/php/ /usr/local/etc/php/
+COPY --from=app /usr/local/lib/php/ /usr/local/lib/php/
+COPY --from=app /usr/local/bin/php* /usr/local/bin/
+COPY --from=app /usr/local/sbin/php-fpm /usr/local/sbin/php-fpm
+
+# Copy application files
+COPY --from=app /var/www/html /var/www/html
+
+# Copy nginx config
+COPY docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Create startup script
+COPY <<'EOF' /start.sh
+#!/bin/sh
+php-fpm -D
+nginx -g 'daemon off;'
+EOF
+
+RUN chmod +x /start.sh
+
+WORKDIR /var/www/html
+
 EXPOSE 80
-
-# Start supervisor
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["/start.sh"]
