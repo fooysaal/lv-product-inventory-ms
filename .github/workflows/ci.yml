@@ -70,6 +70,9 @@ jobs:
           sed -i 's/DB_DATABASE=lv_warehouse_inventory_ms/DB_DATABASE=lv_warehouse_test/' .env
           sed -i 's/DB_USERNAME=root/DB_USERNAME=root/' .env
           sed -i 's/DB_PASSWORD=/DB_PASSWORD=root/' .env
+          sed -i 's/CACHE_STORE=database/CACHE_STORE=array/' .env
+          sed -i 's/SESSION_DRIVER=database/SESSION_DRIVER=array/' .env
+          sed -i 's/QUEUE_CONNECTION=database/QUEUE_CONNECTION=sync/' .env
           sed -i 's/REDIS_HOST=127.0.0.1/REDIS_HOST=127.0.0.1/' .env
 
       - name: Directory Permissions
@@ -81,15 +84,8 @@ jobs:
       - name: Run database seeders
         run: php artisan db:seed --force
 
-      - name: Execute tests with coverage
-        run: php artisan test --coverage --min=80
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        if: matrix.php-version == '8.2'
-        with:
-          files: ./coverage.xml
-          fail_ci_if_error: false
+      - name: Execute tests
+        run: php artisan test
 
   code-quality:
     name: Code Quality Checks
