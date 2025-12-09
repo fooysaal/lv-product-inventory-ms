@@ -5,8 +5,9 @@
 echo "🚀 Starting Laravel Warehouse Inventory Setup..."
 
 # Detect OS for sed compatibility
+# macOS sed requires an empty backup extension (-i ''), while Linux sed uses -i
 SED_INPLACE=(-i)
-if [[ "$OSTYPE" == "darwin"* ]]; then
+if [[ "$(uname -s)" == "Darwin" ]]; then
     SED_INPLACE=(-i '')
 fi
 
