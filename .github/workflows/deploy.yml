@@ -59,13 +59,40 @@ jobs:
           ssh ${{ env.DEPLOY_USER }}@${{ env.DEPLOY_HOST }} "bash -s" << 'ENDSSH'
             set -e
 
-            # Navigate to deployment directory
-            cd ${{ env.DEPLOY_PATH }}
+            # Define paths
+            DEPLOY_ROOT="${{ env.DEPLOY_PATH }}"
+            RELEASE_NAME=$(date +%Y%m%d-%H%M%S)
+            RELEASE_PATH="${DEPLOY_ROOT}/releases/${RELEASE_NAME}"
+            CURRENT_LINK="${DEPLOY_ROOT}/current"
+            SHARED_PATH="${DEPLOY_ROOT}/shared"
 
-            # Pull latest changes
-            git fetch origin
-            git checkout ${{ github.ref_name }}
-            git pull origin ${{ github.ref_name }}
+            # Create directory structure if it doesn't exist
+            mkdir -p "${DEPLOY_ROOT}/releases"
+            mkdir -p "${SHARED_PATH}/storage"
+            mkdir -p "${SHARED_PATH}/storage/app"
+            mkdir -p "${SHARED_PATH}/storage/framework/cache"
+            mkdir -p "${SHARED_PATH}/storage/framework/sessions"
+            mkdir -p "${SHARED_PATH}/storage/framework/views"
+            mkdir -p "${SHARED_PATH}/storage/logs"
+
+            # Clone the repository into the new release directory
+            git clone --depth 1 --branch ${{ github.ref_name }} https://github.com/${{ github.repository }}.git "${RELEASE_PATH}"
+
+            # Create .env symlink if shared .env exists
+            if [ -f "${SHARED_PATH}/.env" ]; then
+              ln -nfs "${SHARED_PATH}/.env" "${RELEASE_PATH}/.env"
+            else
+              echo "Warning: No .env file found in ${SHARED_PATH}/.env"
+              # Copy .env.example as a fallback
+              cp "${RELEASE_PATH}/.env.example" "${RELEASE_PATH}/.env"
+            fi
+
+            # Link shared storage directory
+            rm -rf "${RELEASE_PATH}/storage"
+            ln -nfs "${SHARED_PATH}/storage" "${RELEASE_PATH}/storage"
+
+            # Navigate to release directory
+            cd "${RELEASE_PATH}"
 
             # Install/update Composer dependencies
             composer install --no-dev --optimize-autoloader --no-interaction
@@ -85,13 +112,28 @@ jobs:
             # Clear application cache
             php artisan cache:clear
 
-            # Restart queue workers
-            php artisan queue:restart
-
             # Set permissions
             chmod -R 775 storage bootstrap/cache
 
+            # Save the current release path for potential rollback
+            if [ -L "${CURRENT_LINK}" ]; then
+              PREVIOUS_RELEASE=$(readlink "${CURRENT_LINK}")
+              echo "${PREVIOUS_RELEASE}" > "${DEPLOY_ROOT}/.previous_release"
+            fi
+
+            # Switch the current symlink to the new release
+            ln -nfs "${RELEASE_PATH}" "${CURRENT_LINK}"
+
+            # Restart queue workers (using the current symlink)
+            cd "${CURRENT_LINK}"
+            php artisan queue:restart
+
+            # Clean up old releases (keep last 5 releases)
+            cd "${DEPLOY_ROOT}/releases"
+            ls -1t | tail -n +6 | xargs -r rm -rf
+
             echo "Deployment completed successfully"
+            echo "Release: ${RELEASE_NAME}"
           ENDSSH
 
           echo "url=${{ env.APP_URL }}" >> $GITHUB_OUTPUT
@@ -106,11 +148,40 @@ jobs:
         if: failure()
         run: |
           ssh ${{ env.DEPLOY_USER }}@${{ env.DEPLOY_HOST }} "bash -s" << 'ENDSSH'
-            cd ${{ env.DEPLOY_PATH }}
-            git reset --hard HEAD~1
-            composer install --no-dev --optimize-autoloader --no-interaction
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
+            set -e
+
+            # Define paths
+            DEPLOY_ROOT="${{ env.DEPLOY_PATH }}"
+            CURRENT_LINK="${DEPLOY_ROOT}/current"
+            PREVIOUS_RELEASE_FILE="${DEPLOY_ROOT}/.previous_release"
+
+            # Check if we have a previous release to rollback to
+            if [ -f "${PREVIOUS_RELEASE_FILE}" ]; then
+              PREVIOUS_RELEASE=$(cat "${PREVIOUS_RELEASE_FILE}")
+              
+              if [ -d "${PREVIOUS_RELEASE}" ]; then
+                echo "Rolling back to previous release: ${PREVIOUS_RELEASE}"
+                
+                # Switch the current symlink back to the previous release
+                ln -nfs "${PREVIOUS_RELEASE}" "${CURRENT_LINK}"
+                
+                # Restart services with the previous release
+                cd "${CURRENT_LINK}"
+                php artisan queue:restart
+                php artisan config:cache
+                php artisan route:cache
+                php artisan view:cache
+                
+                echo "✅ Rollback completed successfully"
+              else
+                echo "⚠️ Previous release directory not found: ${PREVIOUS_RELEASE}"
+                echo "Cannot rollback - manual intervention required"
+                exit 1
+              fi
+            else
+              echo "⚠️ No previous release information found"
+              echo "This might be the first deployment - manual intervention required"
+              exit 1
+            fi
           ENDSSH
           echo "⚠️ Deployment failed - rolled back to previous version"
