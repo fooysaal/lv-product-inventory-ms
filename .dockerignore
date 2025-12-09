@@ -1,14 +1,20 @@
 # Git
 .git
+.github
 .gitignore
 .gitattributes
 
-# Docker
-.docker
-Dockerfile
-docker-compose*.yml
+# Environment
+.env
+.env.*
+!.env.example
 
-# IDE
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+
+# IDEs
 .idea
 .vscode
 *.swp
@@ -19,43 +25,45 @@ docker-compose*.yml
 .DS_Store
 Thumbs.db
 
-# Node
-node_modules
-npm-debug.log
-yarn-error.log
-
-# Build files
-/public/hot
-/public/storage
-/public/build
-
 # Laravel
-/vendor
-/storage/*.key
-.env
-.env.backup
-.env.production
-.phpunit.result.cache
-Homestead.json
-Homestead.yaml
-auth.json
-
-# Logs
-*.log
+/storage/app/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/logs/*
+/bootstrap/cache/*
+!storage/.gitkeep
+!storage/app/.gitkeep
+!storage/app/public/.gitkeep
+!storage/framework/.gitkeep
+!storage/framework/cache/.gitkeep
+!storage/framework/sessions/.gitkeep
+!storage/framework/testing/.gitkeep
+!storage/framework/views/.gitkeep
+!storage/logs/.gitkeep
+!bootstrap/cache/.gitkeep
 
 # Testing
-tests
-.phpunit.cache
-phpunit.xml
+.phpunit.result.cache
+tests/
+*.test
 
 # Documentation
-README.md
 *.md
-docs
+!README.md
+docs/
 
-# CI/CD
-.github
-.gitlab-ci.yml
+# Docker
+docker-compose*.yml
+!docker-compose.yml
+Dockerfile.dev
+.dockerignore
 
 # Misc
-postman_collection.json
+*.log
+.editorconfig
+.php_cs
+.php_cs.cache
+phpunit.xml
+phpunit.xml.dist

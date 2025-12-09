@@ -6,7 +6,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: lv-warehouse-app
+      args:
+        BUILDKIT_INLINE_CACHE: 1
+    container_name: lv-product-inventory-app
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
@@ -26,15 +28,23 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     ports:
       - "8080:80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # MySQL Database
   db:
     image: mysql:8.0
-    container_name: lv-warehouse-db
+    container_name: lv-product-inventory-db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-lv_warehouse_inventory_ms}
@@ -48,21 +58,32 @@ services:
     ports:
       - "3307:3306"
     command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # Redis Cache
   redis:
     image: redis:alpine
-    container_name: lv-warehouse-redis
+    container_name: lv-product-inventory-redis
     restart: unless-stopped
     networks:
       - warehouse-network
     ports:
       - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   # phpMyAdmin (optional - for database management)
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: lv-warehouse-phpmyadmin
+    container_name: lv-product-inventory-phpmyadmin
     restart: unless-stopped
     environment:
       PMA_HOST: db

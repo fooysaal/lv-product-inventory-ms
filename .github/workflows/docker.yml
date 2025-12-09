@@ -59,9 +59,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
+          build-args: |
+            BUILDKIT_CONTEXT_KEEP_GIT_DIR=1
 
       - name: Image digest
-        run: echo "Image pushed with digest ${{ steps.build.outputs.digest }}"
+        run: echo "Image pushed with digest ${{ steps.buildandpush.outputs.digest }}"
 
   scan-image:
     name: Scan Docker Image for Vulnerabilities
