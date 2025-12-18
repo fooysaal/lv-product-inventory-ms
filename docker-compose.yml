@@ -1,49 +1,48 @@
 services:
-  #PHP Service
-  lv_warehouse_product_inventory_ms_app:
-    build:
-      args:
-        user: fooysaal
-        uid: 1000
-      context: .
-      dockerfile: .docker/Dockerfile
-    image: lv_warehouse_product_inventory_ms_app
-    container_name: lv_warehouse_product_inventory_ms_app
+  app:
+    build: .
+    container_name: lv-product-inventory-app
     restart: unless-stopped
-    working_dir: /var/www/
-    tty: true
-    environment:
-      SERVICE_NAME: app
-      SERVICE_TAGS: dev
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    ports:
+      - "8080:80"
     volumes:
-      - ./:/var/www
-      - ./.docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - "./.env:/var/www/html/.env:rw"
     networks:
-      - lv_warehouse_product_inventory_ms_app_network
+      - warehouse-network
 
-  #MySQL Service
-  lv_warehouse_product_inventory_ms_app_db:
-    image: mysql:5.7
-    container_name: lv_warehouse_product_inventory_ms_app_db
+  db:
+    image: mysql:8.0
+    container_name: lv-product-inventory-db
     restart: unless-stopped
     ports:
       - "${DOCKER_DB_PORT}:3306"
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_USER: ${DB_USERNAME}
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
+      MYSQL_DATABASE: lv_warehouse_inventory_ms
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: warehouse_user
+      MYSQL_PASSWORD: secret
     volumes:
-      - lv_warehouse_product_inventory_ms_app_mysql_data:/var/lib/mysql
-    networks:
-      - lv_warehouse_product_inventory_ms_app_network
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
-  #Nginx Service
-  lv_warehouse_product_inventory_ms_app_nginx:
-    image: nginx:alpine
-    container_name: lv_warehouse_product_inventory_ms_app_nginx
+    networks:
+      - warehouse-network
+
+  redis:
+    image: redis:alpine
+    container_name: lv-product-inventory-redis
     restart: unless-stopped
     tty: true
     ports:
@@ -53,40 +52,26 @@ services:
       - ./:/var/www
       - ./.docker/nginx/conf.d/:/etc/nginx/conf.d/
     networks:
-      - lv_warehouse_product_inventory_ms_app_network
-  # phpmyadmin service
-  lv_warehouse_product_inventory_ms_app_phpmyadmin:
+      - warehouse-network
+
+  phpmyadmin:
     image: phpmyadmin/phpmyadmin
     restart: unless-stopped
-    container_name: lv_warehouse_product_inventory_ms_app_phpmyadmin
-    depends_on:
-      - lv_warehouse_product_inventory_ms_app_db
     ports:
-      - "${DOCKER_PHPMYADMIN_PORT}:80"
+      - "8081:80"
     environment:
-      PMA_HOST: lv_warehouse_product_inventory_ms_app_db
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    depends_on:
+      - db
     networks:
-      - lv_warehouse_product_inventory_ms_app_network
-
-  lv_warehouse_product_inventory_ms_app_redis_cache:
-    image: redis:alpine
-    restart: always
-    container_name: lv_warehouse_product_inventory_ms_app_redis_cache
-    ports:
-      - '${DOCKER_REDIS_PORT}:6379'
-    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
-    volumes:
-      - lv_warehouse_product_inventory_ms_app_cache:/data
-    networks:
-      - lv_warehouse_product_inventory_ms_app_network
+      - warehouse-network
 
 #Docker Networks
 networks:
-  lv_warehouse_product_inventory_ms_app_network:
-    driver: bridge
+  warehouse-network:
 
 #Volumes
 volumes:
-  lv_warehouse_product_inventory_ms_app_mysql_data:
-  lv_warehouse_product_inventory_ms_app_cache:
+  db-data:
