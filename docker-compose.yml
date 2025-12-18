@@ -1,32 +1,10 @@
-version: '3.8'
-
 services:
-  # Laravel Application
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        BUILDKIT_INLINE_CACHE: 1
+    build: .
     container_name: lv-product-inventory-app
     restart: unless-stopped
-    working_dir: /var/www/html
-    volumes:
-      - ./:/var/www/html
-      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
-    networks:
-      - warehouse-network
-    environment:
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_DATABASE=${DB_DATABASE:-lv_warehouse_inventory_ms}
-      - DB_USERNAME=${DB_USERNAME:-warehouse_user}
-      - DB_PASSWORD=${DB_PASSWORD:-secret}
-      - CACHE_DRIVER=redis
-      - SESSION_DRIVER=redis
-      - QUEUE_CONNECTION=redis
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
@@ -34,73 +12,66 @@ services:
         condition: service_started
     ports:
       - "8080:80"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+    volumes:
+      - "./.env:/var/www/html/.env:rw"
+    networks:
+      - warehouse-network
 
-  # MySQL Database
   db:
     image: mysql:8.0
     container_name: lv-product-inventory-db
     restart: unless-stopped
+    ports:
+      - "${DOCKER_DB_PORT}:3306"
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-lv_warehouse_inventory_ms}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
-      MYSQL_USER: ${DB_USERNAME:-warehouse_user}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_DATABASE: lv_warehouse_inventory_ms
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: warehouse_user
+      MYSQL_PASSWORD: secret
     volumes:
       - db-data:/var/lib/mysql
-    networks:
-      - warehouse-network
-    ports:
-      - "3307:3306"
-    command: --default-authentication-plugin=mysql_native_password
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
 
-  # Redis Cache
+    networks:
+      - warehouse-network
+
   redis:
     image: redis:alpine
     container_name: lv-product-inventory-redis
     restart: unless-stopped
+    tty: true
+    ports:
+      - "${DOCKER_APP_PORT}:80"
+      - "${DOCKER_APP_SSL_PORT}:443"
+    volumes:
+      - ./:/var/www
+      - ./.docker/nginx/conf.d/:/etc/nginx/conf.d/
     networks:
       - warehouse-network
-    ports:
-      - "6380:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
 
-  # phpMyAdmin (optional - for database management)
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: lv-product-inventory-phpmyadmin
     restart: unless-stopped
-    environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: ${DB_ROOT_PASSWORD:-root}
     ports:
       - "8081:80"
-    networks:
-      - warehouse-network
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
     depends_on:
       - db
+    networks:
+      - warehouse-network
 
+#Docker Networks
 networks:
   warehouse-network:
-    driver: bridge
 
+#Volumes
 volumes:
   db-data:
-    driver: local
