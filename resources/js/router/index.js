@@ -218,6 +218,110 @@ const routes = [
         }
     },
 
+    // Stock In Routes
+    {
+        path: '/stock-ins',
+        name: 'stock-ins.index',
+        component: () => import('@/pages/StockIns/Index.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Stock In'
+        }
+    },
+    {
+        path: '/stock-ins/trashed',
+        name: 'stock-ins.trashed',
+        component: () => import('@/pages/StockIns/Trashed.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Trashed Stock In'
+        }
+    },
+    {
+        path: '/stock-ins/create',
+        name: 'stock-ins.create',
+        component: () => import('@/pages/StockIns/Form.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Create Stock In'
+        }
+    },
+    {
+        path: '/stock-ins/:id',
+        name: 'stock-ins.detail',
+        component: () => import('@/pages/StockIns/Detail.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Stock In Details'
+        }
+    },
+    {
+        path: '/stock-ins/:id/edit',
+        name: 'stock-ins.edit',
+        component: () => import('@/pages/StockIns/Form.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Edit Stock In'
+        }
+    },
+
+    // Stock Out Routes
+    {
+        path: '/stock-outs',
+        name: 'stock-outs.index',
+        component: () => import('@/pages/StockOuts/Index.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Stock Out'
+        }
+    },
+    {
+        path: '/stock-outs/trashed',
+        name: 'stock-outs.trashed',
+        component: () => import('@/pages/StockOuts/Trashed.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Trashed Stock Out'
+        }
+    },
+    {
+        path: '/stock-outs/create',
+        name: 'stock-outs.create',
+        component: () => import('@/pages/StockOuts/Form.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Create Stock Out'
+        }
+    },
+    {
+        path: '/stock-outs/:id',
+        name: 'stock-outs.detail',
+        component: () => import('@/pages/StockOuts/Detail.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Stock Out Details'
+        }
+    },
+    {
+        path: '/stock-outs/:id/edit',
+        name: 'stock-outs.edit',
+        component: () => import('@/pages/StockOuts/Form.vue'),
+        meta: {
+            layout: DefaultLayout,
+            requiresAuth: true,
+            title: 'Edit Stock Out'
+        }
+    },
+
     // Default redirect
     {
         path: '/',

@@ -33,13 +33,13 @@
         <!-- Stock Management -->
         <MenuSection title="Stock Management">
             <MenuItem
-                to="/stock-in"
+                to="/stock-ins"
                 icon="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
                 label="Stock In"
             />
             <MenuItem
-                to="/stock-out"
-                icon="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                to="/stock-outs"
+                icon="M16 17l-4 4m0 0l-4-4m4 4V3"
                 label="Stock Out"
             />
             <MenuItem
@@ -50,7 +50,7 @@
             <MenuItem
                 to="/approvals"
                 icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                label="Approvals"
+                label="Pending Approvals"
             />
         </MenuSection>
 

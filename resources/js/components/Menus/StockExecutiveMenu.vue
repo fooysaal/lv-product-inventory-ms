@@ -10,19 +10,24 @@
         <!-- Stock Operations -->
         <MenuSection title="Stock Operations">
             <MenuItem
-                to="/stock-in/create"
+                to="/stock-ins/create"
                 icon="M7 16V4m0 0L3 8m4-4l4 4"
                 label="Record Stock In"
             />
             <MenuItem
-                to="/stock-out/create"
-                icon="M17 16V4m0 0l4 4m-4-4l-4 4"
+                to="/stock-outs/create"
+                icon="M16 17l-4 4m0 0l-4-4m4 4V3"
                 label="Record Stock Out"
             />
             <MenuItem
-                to="/my-transactions"
+                to="/stock-ins"
                 icon="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                label="My Transactions"
+                label="My Stock In"
+            />
+            <MenuItem
+                to="/stock-outs"
+                icon="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                label="My Stock Out"
             />
         </MenuSection>
 

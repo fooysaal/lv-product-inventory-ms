@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\UnitController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\WarehouseController;
+use App\Http\Controllers\Api\StockInController;
+use App\Http\Controllers\Api\StockOutController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -75,6 +77,27 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/warehouses/{warehouse}/statistics', [WarehouseController::class, 'statistics'])->name('warehouses.statistics');
     Route::apiResource('warehouses', WarehouseController::class);
     Route::patch('/warehouses/{warehouse}/toggle-status', [WarehouseController::class, 'toggleStatus'])->name('warehouses.toggle-status');
+
+    // Stock In Management
+    Route::get('/stock-ins/form-data', [StockInController::class, 'getFormData'])->name('stock-ins.form-data');
+    Route::get('/stock-ins/statistics', [StockInController::class, 'statistics'])->name('stock-ins.statistics');
+    Route::get('/stock-ins/trashed', [StockInController::class, 'getTrashed'])->name('stock-ins.trashed');
+    Route::post('/stock-ins/{id}/restore', [StockInController::class, 'restore'])->name('stock-ins.restore');
+    Route::delete('/stock-ins/{id}/force-delete', [StockInController::class, 'forceDelete'])->name('stock-ins.force-delete');
+    Route::post('/stock-ins/{stockIn}/approve', [StockInController::class, 'approve'])->name('stock-ins.approve');
+    Route::post('/stock-ins/{stockIn}/reject', [StockInController::class, 'reject'])->name('stock-ins.reject');
+    Route::apiResource('stock-ins', StockInController::class);
+
+    // Stock Out Management
+    Route::get('/stock-outs/form-data', [StockOutController::class, 'getFormData'])->name('stock-outs.form-data');
+    Route::get('/stock-outs/statistics', [StockOutController::class, 'statistics'])->name('stock-outs.statistics');
+    Route::get('/stock-outs/available-stock', [StockOutController::class, 'getAvailableStock'])->name('stock-outs.available-stock');
+    Route::get('/stock-outs/trashed', [StockOutController::class, 'getTrashed'])->name('stock-outs.trashed');
+    Route::post('/stock-outs/{id}/restore', [StockOutController::class, 'restore'])->name('stock-outs.restore');
+    Route::delete('/stock-outs/{id}/force-delete', [StockOutController::class, 'forceDelete'])->name('stock-outs.force-delete');
+    Route::post('/stock-outs/{stockOut}/approve', [StockOutController::class, 'approve'])->name('stock-outs.approve');
+    Route::post('/stock-outs/{stockOut}/reject', [StockOutController::class, 'reject'])->name('stock-outs.reject');
+    Route::apiResource('stock-outs', StockOutController::class);
 });
 
 // Legacy route - kept for backward compatibility
