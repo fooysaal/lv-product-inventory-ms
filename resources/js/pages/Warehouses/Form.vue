@@ -118,8 +118,10 @@
                                     v-model="form.city"
                                     type="text"
                                     placeholder="Enter city"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                                    class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                                    :class="{'border-red-500': errors.city, 'border-gray-300': !errors.city}"
                                 />
+                                <p v-if="errors.city" class="mt-1.5 text-xs text-red-600">{{ errors.city[0] }}</p>
                             </div>
 
                             <!-- State -->
@@ -131,8 +133,10 @@
                                     v-model="form.state"
                                     type="text"
                                     placeholder="Enter state/province"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                                    class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                                    :class="{'border-red-500': errors.state, 'border-gray-300': !errors.state}"
                                 />
+                                <p v-if="errors.state" class="mt-1.5 text-xs text-red-600">{{ errors.state[0] }}</p>
                             </div>
 
                             <!-- Country -->
@@ -160,8 +164,10 @@
                                     v-model="form.postal_code"
                                     type="text"
                                     placeholder="Enter postal code"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                                    class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                                    :class="{'border-red-500': errors.postal_code, 'border-gray-300': !errors.postal_code}"
                                 />
+                                <p v-if="errors.postal_code" class="mt-1.5 text-xs text-red-600">{{ errors.postal_code[0] }}</p>
                             </div>
                         </div>
                     </div>
@@ -234,7 +240,8 @@
                             </label>
                             <select
                                 v-model="form.capacity_unit"
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                                class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                                :class="{'border-red-500': errors.capacity_unit, 'border-gray-300': !errors.capacity_unit}"
                             >
                                 <option value="">Select Unit</option>
                                 <option value="sq ft">Square Feet (sq ft)</option>
@@ -244,6 +251,7 @@
                                 <option value="pallets">Pallets</option>
                                 <option value="shelves">Shelves</option>
                             </select>
+                            <p v-if="errors.capacity_unit" class="mt-1.5 text-xs text-red-600">{{ errors.capacity_unit[0] }}</p>
                         </div>
                     </div>
                 </div>
@@ -378,7 +386,17 @@ export default {
 
                 if (err.response?.status === 422 && err.response?.data?.errors) {
                     this.errors = err.response.data.errors;
-                    this.toast.error('Please fix the validation errors');
+                    const errorCount = Object.keys(this.errors).length;
+                    this.toast.error(`Please fix ${errorCount} validation error${errorCount > 1 ? 's' : ''}`);
+
+                    // Scroll to first error
+                    this.$nextTick(() => {
+                        const firstError = document.querySelector('.border-red-500');
+                        if (firstError) {
+                            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            firstError.focus();
+                        }
+                    });
                 } else {
                     this.toast.error(err.response?.data?.message || 'Failed to save warehouse');
                 }
